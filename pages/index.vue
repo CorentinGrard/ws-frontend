@@ -11,11 +11,11 @@
     >
       
     </v-flex>
-    {{data}}
-    <!-- <v-data-table
+ 
+     <v-data-table
       :headers="headers"
       :items="data"
-    ></v-data-table> -->
+    ></v-data-table>
   </v-layout>
 </template>
 
@@ -35,8 +35,9 @@ export default {
     }
   },
   async created() {
-    let response = await this.$axios.get("localhost:5000/api/v1/vol");
+    let response = await this.$axios.get("http://localhost:5000/api/v1/vol");
     this.data = response.data
+
 
   },
 }
