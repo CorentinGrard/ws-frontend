@@ -13,7 +13,6 @@
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
     "keycloak-js": "^8.0.1",
-    "keycloak-connect": "8.0.1",
     "nuxt": "^2.0.0"
   },
   "devDependencies": {

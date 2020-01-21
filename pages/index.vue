@@ -21,46 +21,38 @@ export default {
     };
   },
   async created() {
-    const Keycloak = require("keycloak-js");
-    let initOptions = {
-      'auth-server-url': "http://localhost:8080/auth",
-      realm: "ws",
-      clientId: "webapp",
-      onLoad: "check-sso",
-      'public-client' : true,
-      'confidential-port ' : 0
-    };
-    var keycloak = new Keycloak(initOptions);
-    let kc = await keycloak.init({
-      promiseType: "native",
-      onLoad: "login-required"
-    });
-    if (kc) {
-      /*let response = await this.$axios.get("http://localhost:5000/api/v1/vol", {
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer" + keycloak.token
-        }
-      });
-      this.data = response.data;*/
-
-      var req = new XMLHttpRequest();
-      req.open("GET", "http://localhost:5000/api/v1/vol", true);
-      req.setRequestHeader("Accept", "application/json");
-      req.setRequestHeader("Authorization", "Bearer " + keycloak.token);
-
-      req.onreadystatechange = function() {
-        if (req.readyState == 4) {
-          if (req.status == 200) {
-            alert("Success");
-          } else if (req.status == 403) {
-            alert("Forbidden");
+    const Keycloak= require('keycloak-js')
+    var keycloak = new Keycloak();
+      keycloak
+        .init({
+          onLoad: "login-required",
+          promiseType: "native"
+        })
+        .then(function(authenticated) {
+          alert(authenticated ? "authenticated" : "not authenticated");
+          if (authenticated) {
+            loadData();
           }
-        }
-      };
+        })
+        .catch(function() {
+          alert("failed to initialize");
+        });
 
-      req.send();
-    }
+      var loadData = async function() {
+          this.username =
+          keycloak.idTokenParsed.preferred_username;
+      myheaders = new Headers();
+      myheaders.append("Authorization","Bearer " + keycloak.token)
+        let body = {
+          method: "GET",
+          headers:myheaders,
+          cache: "default"
+        };
+
+        let response = await fetch("http://127.0.0.1:5000/api/v1/vol", body);
+        this.data = await response.json()
+        console.log(this.data);
+      };
   }
 };
 </script>
