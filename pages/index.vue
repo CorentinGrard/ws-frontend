@@ -21,38 +21,33 @@ export default {
     };
   },
   async created() {
-    const Keycloak= require('keycloak-js')
+    const Keycloak = require("keycloak-js");
     var keycloak = new Keycloak();
-      keycloak
-        .init({
-          onLoad: "login-required",
-          promiseType: "native"
-        })
-        .then(function(authenticated) {
-          alert(authenticated ? "authenticated" : "not authenticated");
-          if (authenticated) {
-            loadData();
-          }
-        })
-        .catch(function() {
-          alert("failed to initialize");
-        });
-
-      var loadData = async function() {
-          this.username =
-          keycloak.idTokenParsed.preferred_username;
-      myheaders = new Headers();
-      myheaders.append("Authorization","Bearer " + keycloak.token)
-        let body = {
-          method: "GET",
-          headers:myheaders,
-          cache: "default"
-        };
-
-        let response = await fetch("http://127.0.0.1:5000/api/v1/vol", body);
-        this.data = await response.json()
-        console.log(this.data);
-      };
+    let kc
+    try {
+      kc = await keycloak.init({
+        onLoad: "login-required",
+        promiseType: "native"
+      });
+    } catch (error) {
+      console.error(error);
+    }
+    console.log(kc ? "authenticated" : "not authenticated");
+    this.username = keycloak.idTokenParsed.preferred_username;
+    let myheaders = new Headers();
+    myheaders.append("Authorization", "Bearer " + keycloak.token);
+    let body = {
+      method: "GET",
+      headers: myheaders,
+      cache: "default"
+    };
+    let response = await fetch("http://127.0.0.1:5000/api/v1/vol", body);
+    if(response.status == 200){
+      this.data = await response.json();
+      console.log(this.data);
+    }else{
+      console.error('erreur')
+    }
   }
 };
 </script>
