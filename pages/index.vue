@@ -1,7 +1,10 @@
 <template>
   <v-layout column justify-center align-center>
-    <h2>{{ username }}</h2>
-    <v-data-table :headers="headers" :items="data"></v-data-table>
+    <h2>Username : {{ username }}</h2>
+    <h3>Vols</h3>
+    <v-data-table :headers="headers_rest" :items="data_rest"></v-data-table>
+    <h3>Hotels</h3>
+    <v-data-table :headers="headers_soap" :items="data_soap"></v-data-table>
   </v-layout>
 </template>
 
@@ -9,15 +12,22 @@
 export default {
   data() {
     return {
-      headers: [
+      headers_rest: [
         { text: "ID", value: "id" },
         { text: "Company", value: "company" },
         { text: "Place", value: "place" },
         { text: "Price", value: "price" },
         { text: "Date", value: "date" }
       ],
+      headers_soap: [
+        { text: "Number", value: "number" },
+        { text: "Prix", value: "prix" },
+        { text: "Type", value: "type" },
+        { text: "Occupe", value: "occupe" },
+      ],
       username: "",
-      data: []
+      data_rest: [],
+      data_soap: []
     };
   },
   async created() {
@@ -34,19 +44,23 @@ export default {
     }
     console.log(kc ? "authenticated" : "not authenticated");
     this.username = keycloak.idTokenParsed.preferred_username;
-    let myheaders = new Headers();
-    myheaders.append("Authorization", "Bearer " + keycloak.token);
-    let body = {
+    let init = {
       method: "GET",
-      headers: myheaders,
-      cache: "default"
+      headers: {
+        "Authorization": "Bearer " + keycloak.token,
+      }
     };
-    let response = await fetch("http://127.0.0.1:5000/api/v1/vol", body);
-    if(response.status == 200){
-      this.data = await response.json();
-      console.log(this.data);
+    let response_rest = await fetch("http://localhost:5000/api/v1/vol", init);
+    if(response_rest.status == 200){
+      this.data_rest = await response_rest.json();
     }else{
-      console.error('erreur')
+      console.error('erreur rest')
+    }
+    let response_soap = await fetch("http://localhost:5000/api/v1/hotel", init);
+    if(response_soap.status == 200){
+      this.data_soap = await response_soap.json();
+    }else{
+      console.error('erreur soap')
     }
   }
 };
